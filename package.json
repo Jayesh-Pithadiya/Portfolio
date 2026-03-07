@@ -3,8 +3,11 @@
     "version": "4.0.0",
     "private": true,
     "scripts": {
-        "install:all": "npm install && npm install --prefix client && npm install --prefix server",
-        "build": "npm run build --prefix client",
+        "install:client": "npm install --prefix client",
+        "install:server": "npm install --prefix server",
+        "install:all": "npm install && npm run install:client && npm run install:server",
+        "build:client": "npm run build --prefix client",
+        "build": "npm run build:client",
         "start": "npm start --prefix server",
         "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\""
     },
