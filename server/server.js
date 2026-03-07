@@ -79,15 +79,30 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Resolve the absolute path to the React build folder (project-root/client/build)
-const buildPath = path.resolve(__dirname, '../client/build');
+// Resolve the absolute path to the Backend Public folder (server/public)
+const publicPath = path.resolve(__dirname, 'public');
 
-// Serve static files from the React app build directory
-app.use(express.static(buildPath));
+// Serve static files from the public directory
+app.use(express.static(publicPath));
+
+// Redirect root to Admin Login (/login/private) as requested
+app.get('/', (req, res) => {
+    res.redirect('/login/private');
+});
 
 // Redirect /admin to the React dashboard path (/login/private)
 app.get('/admin', (req, res) => {
     res.redirect('/login/private');
+});
+
+// JSON API info route
+app.get('/api', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Backend API is working',
+        status: 'online',
+        version: '4.0.0'
+    });
 });
 
 // API routes
@@ -97,7 +112,7 @@ app.use('/api', apiRoutes);
 // The catchall handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.use((req, res, next) => {
-    // Check if it's an API request first to avoid sending index.html for missing API routes
+    // If it's a sub-path under /api/ that wasn't matched above
     if (req.path.startsWith('/api/')) {
         return res.status(404).json({
             success: false,
@@ -105,7 +120,8 @@ app.use((req, res, next) => {
             path: req.path
         });
     }
-    res.sendFile(path.join(buildPath, 'index.html'));
+    // Serve index.html for React Router to handle
+    res.sendFile(path.join(publicPath, 'index.html'));
 });
 
 // Global error handler
