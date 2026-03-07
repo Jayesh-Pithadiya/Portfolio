@@ -79,43 +79,25 @@ app.get('/health', (req, res) => {
     });
 });
 
-// API status
-app.get('/', (req, res) => {
-    res.json({
-        message: 'Portfolio API Server',
-        status: 'running',
-        version: '3.0.0',
-        environment: config.NODE_ENV
-    });
-});
+// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
 
-// Serve admin panel static files
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
-
-// Optional admin auth route (query key)
-app.get('/admin', (req, res) => {
-    const key = req.query.key;
-    if (key !== 'root123') {
-        return res.status(401).send('Unauthorized');
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+    // Check if it's an API request first to avoid sending index.html for missing API routes
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({
+            success: false,
+            message: 'API route not found',
+            path: req.path
+        });
     }
-    res.sendFile(path.join(__dirname, 'admin', 'index.html'));
-});
-
-// API route to get private data
-app.get('/login/private', (req, res) => {
-    const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json'), 'utf-8'));
-    res.json(data);
-});
-
-// API route to update private data
-app.post('/login/private', (req, res) => {
-    const newData = req.body;
-    fs.writeFileSync(path.join(__dirname, 'data.json'), JSON.stringify(newData, null, 2));
-    res.json({ message: 'Data updated successfully' });
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 // 404 handler
