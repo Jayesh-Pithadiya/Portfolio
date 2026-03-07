@@ -1,18 +1,20 @@
 {
     "name": "portfolio-monorepo",
     "version": "4.0.0",
+    "type": "module",
     "private": true,
     "scripts": {
         "install:client": "npm install --prefix client",
         "install:server": "npm install --prefix server",
         "install:all": "npm install && npm run install:client && npm run install:server",
         "build:client": "npm run build --prefix client",
-        "prepare:public": "powershell -Command \"if (Test-Path server/public) { Remove-Item -Path server/public -Recurse -Force }; New-Item -ItemType Directory -Path server/public; Copy-Item -Path client/build/* -Destination server/public -Recurse -Force\"",
+        "prepare:public": "node scripts/prepare-public.js",
         "build": "npm run build:client && npm run prepare:public",
         "start": "npm start --prefix server",
         "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\""
     },
     "devDependencies": {
-        "concurrently": "^8.2.2"
+        "concurrently": "^8.2.2",
+        "fs-extra": "^11.3.4"
     }
 }
