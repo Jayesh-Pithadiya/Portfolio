@@ -15,9 +15,7 @@ const Contact = () => {
         };
     }, []);
 
-    const API_BASE = process.env.NODE_ENV === 'production' 
-        ? 'https://your-api-domain.com' 
-        : 'http://localhost:5000';
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

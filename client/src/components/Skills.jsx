@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 const Skills = () => {
     const [skills, setSkills] = useState([]);
 
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
     useEffect(() => {
-        fetch('http://localhost:5000/api/data')
+        fetch(`${API_BASE}/api/data`)
             .then(res => res.json())
             .then(data => {
                 if (data.skills) setSkills(data.skills);

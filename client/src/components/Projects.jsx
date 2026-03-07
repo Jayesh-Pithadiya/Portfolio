@@ -30,8 +30,10 @@ const Projects = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showAll, setShowAll] = useState(false);
 
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
     useEffect(() => {
-        fetch('http://localhost:5000/api/data')
+        fetch(`${API_BASE}/api/data`)
             .then(res => res.json())
             .then(data => {
                 if (data.projects) setProjects(data.projects);

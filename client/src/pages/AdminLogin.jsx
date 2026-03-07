@@ -24,9 +24,7 @@ const AdminLogin = () => {
         githubUrl: '' 
     });
 
-    const API_BASE = process.env.NODE_ENV === 'production' 
-        ? 'https://your-api-domain.com' 
-        : 'http://localhost:5000';
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     useEffect(() => {
         const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
