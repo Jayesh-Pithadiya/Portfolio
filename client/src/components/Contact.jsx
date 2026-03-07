@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const Contact = () => {
     const [status, setStatus] = useState('');
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const statusTimeoutRef = useRef(null);
+
+    // Cleanup timeout on component unmount
+    useEffect(() => {
+        return () => {
+            if (statusTimeoutRef.current) {
+                clearTimeout(statusTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const API_BASE = process.env.NODE_ENV === 'production' 
         ? 'https://your-api-domain.com' 
@@ -30,7 +40,11 @@ const Contact = () => {
             if (response.ok && data.success) {
                 setStatus('success');
                 setFormData({ name: '', email: '', message: '' });
-                setTimeout(() => setStatus(''), 5000);
+                // Clear any existing timeout before setting a new one
+                if (statusTimeoutRef.current) {
+                    clearTimeout(statusTimeoutRef.current);
+                }
+                statusTimeoutRef.current = setTimeout(() => setStatus(''), 5000);
             } else {
                 setStatus('error');
                 console.error('Server error:', data.message);

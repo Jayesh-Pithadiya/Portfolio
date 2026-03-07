@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './AdminLogin.css';
 
 const AdminLogin = () => {
@@ -8,6 +8,7 @@ const AdminLogin = () => {
     const [loading, setLoading] = useState(false);
     const [showWelcome, setShowWelcome] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const welcomeTimeoutRef = useRef(null);
 
     const [skills, setSkills] = useState([]);
     const [projects, setProjects] = useState([]);
@@ -33,6 +34,13 @@ const AdminLogin = () => {
             setStep('dashboard');
             fetchData();
         }
+
+        // Cleanup timeout on component unmount
+        return () => {
+            if (welcomeTimeoutRef.current) {
+                clearTimeout(welcomeTimeoutRef.current);
+            }
+        };
     }, []);
 
     const fetchData = async () => {
@@ -71,7 +79,11 @@ const AdminLogin = () => {
             if (data.success) {
                 localStorage.setItem('isAdminLoggedIn', 'true');
                 setShowWelcome(true);
-                setTimeout(() => {
+                // Clear any existing timeout before setting a new one
+                if (welcomeTimeoutRef.current) {
+                    clearTimeout(welcomeTimeoutRef.current);
+                }
+                welcomeTimeoutRef.current = setTimeout(() => {
                     setShowWelcome(false);
                     setStep('dashboard');
                     fetchData();
