@@ -82,6 +82,11 @@ app.get('/health', (req, res) => {
 // Serve static files from the React app build directory
 app.use(express.static(path.join(__dirname, '../client/build')));
 
+// Redirect /admin to the React dashboard path (/login/private)
+app.get('/admin', (req, res) => {
+    res.redirect('/login/private');
+});
+
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
