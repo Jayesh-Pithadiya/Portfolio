@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: portfolio-unified
+    name: backend-nzlg
     env: node
     plan: free
     buildCommand: npm run install:all && npm run build
