@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import config from './config/config.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+import fs from 'fs';
 import authRoutes from './routes/auth.js';
 import apiRoutes from './routes/api.js';
 
@@ -15,7 +20,7 @@ const corsOptions = {
         const allowedOrigins = config.NODE_ENV === 'production'
             ? [config.CLIENT_URL, 'https://jayeshpithadiya.com', 'https://www.jayeshpithadiya.com']
             : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
-        
+
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -46,12 +51,12 @@ app.use((req, res, next) => {
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     // Remove X-Powered-By header
     res.removeHeader('X-Powered-By');
-    
+
     // Content Security Policy (adjust as needed)
     if (config.NODE_ENV === 'production') {
         res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     }
-    
+
     next();
 });
 
@@ -87,6 +92,31 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
+
+// Serve admin panel static files
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
+// Optional admin auth route (query key)
+app.get('/admin', (req, res) => {
+    const key = req.query.key;
+    if (key !== 'root123') {
+        return res.status(401).send('Unauthorized');
+    }
+    res.sendFile(path.join(__dirname, 'admin', 'index.html'));
+});
+
+// API route to get private data
+app.get('/login/private', (req, res) => {
+    const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json'), 'utf-8'));
+    res.json(data);
+});
+
+// API route to update private data
+app.post('/login/private', (req, res) => {
+    const newData = req.body;
+    fs.writeFileSync(path.join(__dirname, 'data.json'), JSON.stringify(newData, null, 2));
+    res.json({ message: 'Data updated successfully' });
+});
 
 // 404 handler
 app.use((req, res) => {
@@ -138,7 +168,7 @@ app.use((err, req, res, next) => {
 // Graceful shutdown
 const gracefulShutdown = (signal) => {
     console.log(`\n${signal} received. Starting graceful shutdown...`);
-    
+
     server.close(() => {
         console.log('HTTP server closed');
         process.exit(0);
