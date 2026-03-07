@@ -85,17 +85,7 @@ const publicPath = path.resolve(__dirname, 'public');
 // Serve static files from the public directory
 app.use(express.static(publicPath));
 
-// Redirect root to Admin Login (/admin/private) as requested
-app.get('/', (req, res) => {
-    res.redirect('/admin/private');
-});
-
-// Redirect /admin to the React dashboard path (/admin/private)
-app.get('/admin', (req, res) => {
-    res.redirect('/admin/private');
-});
-
-// JSON API info route
+// API Info route
 app.get('/api', (req, res) => {
     res.json({
         success: true,
