@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -9,9 +9,28 @@ const rootDir = path.resolve(__dirname, '..');
 const clientBuildDir = path.join(rootDir, 'client', 'build');
 const serverPublicDir = path.join(rootDir, 'server', 'public');
 
+/**
+ * Recursively copies a directory.
+ */
+function copyRecursiveSync(src, dest) {
+    const exists = fs.existsSync(src);
+    const stats = exists && fs.statSync(src);
+    const isDirectory = exists && stats.isDirectory();
+    if (isDirectory) {
+        if (!fs.existsSync(dest)) {
+            fs.mkdirSync(dest);
+        }
+        fs.readdirSync(src).forEach((childItemName) => {
+            copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
+        });
+    } else {
+        fs.copyFileSync(src, dest);
+    }
+}
+
 async function prepare() {
     try {
-        console.log('🚀 Starting cross-platform public folder preparation...');
+        console.log('🚀 Starting NO-DEPENDENCY public folder preparation...');
 
         // Check if client build exists
         if (!fs.existsSync(clientBuildDir)) {
@@ -22,16 +41,16 @@ async function prepare() {
         // Remove existing server/public
         if (fs.existsSync(serverPublicDir)) {
             console.log('🧹 Cleaning existing server/public folder...');
-            await fs.remove(serverPublicDir);
+            fs.rmSync(serverPublicDir, { recursive: true, force: true });
         }
 
         // Create new server/public
         console.log('📁 Creating server/public folder...');
-        await fs.ensureDir(serverPublicDir);
+        fs.mkdirSync(serverPublicDir, { recursive: true });
 
         // Copy build contents
         console.log('📦 Copying build files to server/public...');
-        await fs.copy(clientBuildDir, serverPublicDir);
+        copyRecursiveSync(clientBuildDir, serverPublicDir);
 
         console.log('✅ Success! Public folder is ready for serving.');
     } catch (err) {
