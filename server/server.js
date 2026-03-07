@@ -79,8 +79,11 @@ app.get('/health', (req, res) => {
     });
 });
 
+// Resolve the absolute path to the React build folder (project-root/client/build)
+const buildPath = path.resolve(__dirname, '../client/build');
+
 // Serve static files from the React app build directory
-app.use(express.static(path.join(__dirname, '../client/build')));
+app.use(express.static(buildPath));
 
 // Redirect /admin to the React dashboard path (/login/private)
 app.get('/admin', (req, res) => {
@@ -102,7 +105,7 @@ app.use((req, res, next) => {
             path: req.path
         });
     }
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+    res.sendFile(path.join(buildPath, 'index.html'));
 });
 
 // Global error handler
