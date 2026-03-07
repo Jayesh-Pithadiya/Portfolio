@@ -145,9 +145,8 @@ app.use((err, req, res, next) => {
     // Default error response
     res.status(err.status || 500).json({
         success: false,
-        message: config.NODE_ENV === 'production'
-            ? 'Internal server error'
-            : err.message,
+        message: err.message, // Temporarily expose for debugging
+        path: req.path,
         ...(config.NODE_ENV === 'development' && { stack: err.stack })
     });
 });
@@ -173,7 +172,8 @@ const server = app.listen(config.PORT, () => {
     console.log('\n🚀 Server started successfully!');
     console.log(`📍 Port: ${config.PORT}`);
     console.log(`🌍 Environment: ${config.NODE_ENV}`);
-    console.log(`🔗 API: http://localhost:${config.PORT}`);
+    console.log(`� Static Path: ${publicPath}`);
+    console.log(`�🔗 API: http://localhost:${config.PORT}`);
     console.log(`✅ Server is ready to accept requests\n`);
 });
 

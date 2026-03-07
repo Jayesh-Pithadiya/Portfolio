@@ -45,14 +45,23 @@ async function prepare() {
         }
 
         // Create new server/public
-        console.log('📁 Creating server/public folder...');
+        console.log(`📁 Creating folder: ${serverPublicDir}`);
         fs.mkdirSync(serverPublicDir, { recursive: true });
 
         // Copy build contents
-        console.log('📦 Copying build files to server/public...');
+        console.log(`📦 Copying from ${clientBuildDir} to ${serverPublicDir}...`);
         copyRecursiveSync(clientBuildDir, serverPublicDir);
 
-        console.log('✅ Success! Public folder is ready for serving.');
+        // Verify index.html exists in destination
+        const destIndex = path.join(serverPublicDir, 'index.html');
+        if (fs.existsSync(destIndex)) {
+            console.log(`✅ Verified: index.html is at ${destIndex}`);
+        } else {
+            console.error(`❌ Error: index.html is MISSING at ${destIndex}`);
+            process.exit(1);
+        }
+
+        console.log('✅ Success! Public folder is fully populated.');
     } catch (err) {
         console.error('❌ Error during preparation:', err);
         process.exit(1);
