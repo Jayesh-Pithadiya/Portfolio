@@ -10,7 +10,7 @@
         "build:client": "npm run build --prefix client",
         "prepare:public": "node scripts/prepare-public.js",
         "build": "npm run build:client && npm run prepare:public",
-        "start": "npm start --prefix server",
+        "start": "cd server && npm start",
         "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\""
     },
     "dependencies": {
