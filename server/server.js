@@ -86,9 +86,9 @@ app.use(express.static(path.join(__dirname, '../client/build')));
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
 
-// The "catchall" handler: for any request that doesn't
+// The catchall handler: for any request that doesn't
 // match one above, send back React's index.html file.
-app.get('*', (req, res) => {
+app.use((req, res, next) => {
     // Check if it's an API request first to avoid sending index.html for missing API routes
     if (req.path.startsWith('/api/')) {
         return res.status(404).json({
@@ -98,15 +98,6 @@ app.get('*', (req, res) => {
         });
     }
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-});
-
-// 404 handler
-app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'Route not found',
-        path: req.path
-    });
 });
 
 // Global error handler
